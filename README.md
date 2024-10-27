@@ -1,50 +1,123 @@
-# React + TypeScript + Vite
+# Productivity Timer Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prodigy InfoTech Internship Project - Task #2
+> A web development project completed during my Full Stack Development Internship at Prodigy InfoTech.
 
-Currently, two official plugins are available:
+![Productivity Timer Screenshot](./public/stopwatch.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Overview
 
-## Expanding the ESLint configuration
+This productivity timer application was developed as part of my internship project at Prodigy InfoTech. It's a comprehensive time management tool built with modern web technologies, demonstrating proficiency in React, TypeScript, and responsive design principles.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### 🎯 Project Goals
+- Create an interactive stopwatch application
+- Implement multiple timer functionality
+- Develop a responsive and user-friendly interface
+- Practice modern React development patterns
+- Apply TypeScript for type safety
 
-- Configure the top-level `parserOptions` property like this:
+## Features
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Core Functionality
+- **Multiple Timers**: Run multiple stopwatches and countdown timers simultaneously
+- **Activity Tracking**: Categorize and track different types of tasks
+- **Lap Recording**: Track split times with detailed lap recording
+- **Target Duration**: Set and monitor time goals
+- **Dark Mode**: Toggle between light and dark themes
+
+### Productivity Features
+- **Task Management**: Label and organize different activities
+- **Detailed Reports**: Generate comprehensive productivity summaries
+- **Progress Tracking**: Visual progress indicators
+- **Activity Categories**: Organize tasks into predefined categories
+  - Work
+  - Study
+  - Exercise
+  - Reading
+  - Meditation
+  - Hobby
+  - Custom tasks
+
+## Technical Stack
+
+- **Frontend Framework**: React 18
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: React Hooks
+- **Icons**: React Icons
+- **Version Control**: Git
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Chymezy/PRODIGY_WD_02.git
+cd PRODIGY_WD_02
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+2. Install dependencies:
+```bash
+npm install
 ```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+## Usage
+
+### Quick Start Guide
+1. Click "Track New Task" to create a stopwatch
+2. Click "Set New Timer" for countdown timer
+3. Set task labels and categories
+4. Use keyboard shortcuts (Ctrl + S for stopwatch, Ctrl + T for timer)
+
+### Features in Detail
+- **Task Labeling**: Give each timer a meaningful name
+- **Activity Types**: Choose from predefined categories
+- **Progress Tracking**: Monitor completion status
+- **Lap Times**: Record and review split times
+- **Dark Mode**: Toggle between light and dark themes
+
+## Development Experience
+
+This project was developed during my internship at Prodigy InfoTech, where I:
+- Implemented modern React development practices
+- Utilized TypeScript for enhanced code reliability
+- Created a responsive design using Tailwind CSS
+- Developed intuitive user interfaces
+- Practiced clean code principles
+- Implemented proper state management
+
+## Future Enhancements
+
+- Data persistence with backend integration
+- Export functionality for productivity reports
+- Additional activity categories
+- Team collaboration features
+- Mobile application version
+
+## Internship Details
+
+- **Company**: Prodigy InfoTech
+- **Position**: Full Stack Development Intern
+- **Duration**: September 2024 - October 2024
+- **Project Type**: Web Development
+- **Task**: #2 - Stopwatch Web Application
+
+## Contact
+
+- Your Name - [your.email@example.com](mailto:chymezy332@gmail.com)
+- LinkedIn - [Your LinkedIn Profile](https://linkedin.com/in/Chymezy)
+- Project Link: [https://github.com/Chymezy/PRODIGY_WD_02.git](https://github.com/Chymezy/PRODIGY_WD_02.git)
+
+## Acknowledgments
+
+- Prodigy InfoTech for the internship opportunity
+- Mentors and supervisors for their guidance
+- React and TypeScript communities for resources and documentation
+
+---
+<p align="center">Developed with ❤️ during my internship at Prodigy InfoTech</p>
