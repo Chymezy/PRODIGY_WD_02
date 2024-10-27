@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { FaPlay, FaStop, FaUndo, FaClock, FaTimesCircle } from 'react-icons/fa';
 
 interface TimerProps {
   onRemove: () => void;
@@ -79,13 +80,13 @@ const Timer: React.FC<TimerProps> = ({ onRemove, darkMode, label, onUpdateLabel,
           onClick={onRemove}
           className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          ✖️
+          <FaTimesCircle />
         </button>
         <h2 
-          className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 cursor-pointer hover:underline"
+          className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 cursor-pointer hover:underline flex items-center"
           onClick={handleLabelClick}
         >
-          {label}
+          <FaClock className="mr-2" /> {label}
         </h2>
       </div>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-center text-gray-800 dark:text-white font-mono">
@@ -108,13 +109,13 @@ const Timer: React.FC<TimerProps> = ({ onRemove, darkMode, label, onUpdateLabel,
           }`}
           onClick={handleStartStop}
         >
-          {isRunning ? 'Stop' : 'Start'}
+          {isRunning ? <FaStop /> : <FaPlay />}
         </button>
         <button
           className="px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-gray-500 hover:bg-gray-600 text-white font-semibold transition-colors duration-300"
           onClick={handleReset}
         >
-          Reset
+          <FaUndo />
         </button>
       </div>
     </div>

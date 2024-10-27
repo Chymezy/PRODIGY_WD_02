@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Stopwatch from './Stopwatch';
 import Timer from './Timer';
+import { FaSun, FaMoon, FaPlus } from 'react-icons/fa';
 
 interface TimerContainerProps {
   darkMode: boolean;
   setDarkMode: (darkMode: boolean) => void;
 }
 
-interface CompletedTask {
+interface CompletedTaskReport {
   label: string;
   duration: number;
-  type: 'stopwatch' | 'timer';
-  laps?: { id: number; time: string }[];
+  targetDuration: number | null;
+  laps: { id: number; time: string; duration: number }[];
+  completed: boolean;
+  activityType: string;
 }
 
 const TimerContainer: React.FC<TimerContainerProps> = ({ darkMode, setDarkMode }) => {
@@ -19,7 +22,7 @@ const TimerContainer: React.FC<TimerContainerProps> = ({ darkMode, setDarkMode }
     const savedTimers = localStorage.getItem('timers');
     return savedTimers ? JSON.parse(savedTimers) : [{ id: 1, type: 'stopwatch', label: 'Task 1' }];
   });
-  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<CompletedTaskReport[]>([]);
 
   useEffect(() => {
     localStorage.setItem('timers', JSON.stringify(timers));
@@ -60,8 +63,8 @@ const TimerContainer: React.FC<TimerContainerProps> = ({ darkMode, setDarkMode }
     setTimers(timers.map(timer => timer.id === id ? { ...timer, label: newLabel } : timer));
   };
 
-  const handleComplete = (label: string, duration: number, type: 'stopwatch' | 'timer', laps?: { id: number; time: string }[]) => {
-    setCompletedTasks([...completedTasks, { label, duration, type, laps }]);
+  const handleComplete = (report: CompletedTaskReport) => {
+    setCompletedTasks([...completedTasks, report]);
   };
 
   const getTotalProductiveTime = () => {
@@ -69,67 +72,142 @@ const TimerContainer: React.FC<TimerContainerProps> = ({ darkMode, setDarkMode }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 dark:from-gray-800 dark:to-gray-900">
-      <div className="flex justify-between items-center w-full p-4">
-        <h1 className="text-2xl font-bold text-white">Productivity Timer</h1>
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-800 dark:text-white"
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-      </div>
-      <div className="flex-grow flex flex-col items-center justify-center p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl">
-          {timers.map((timer) => (
-            <div key={timer.id} className="w-full">
-              {timer.type === 'stopwatch' ? (
-                <Stopwatch 
-                  onRemove={() => removeTimer(timer.id)} 
-                  darkMode={darkMode} 
-                  label={timer.label} 
-                  onUpdateLabel={(newLabel) => updateLabel(timer.id, newLabel)}
-                  onComplete={(label, duration, laps) => handleComplete(label, duration, 'stopwatch', laps)}
-                />
-              ) : (
-                <Timer 
-                  onRemove={() => removeTimer(timer.id)} 
-                  darkMode={darkMode} 
-                  label={timer.label} 
-                  onUpdateLabel={(newLabel) => updateLabel(timer.id, newLabel)}
-                  onComplete={(label, duration) => handleComplete(label, duration, 'timer')}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 space-x-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-opacity-90 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Productivity Timer</h1>
           <button
-            onClick={addStopwatch}
-            className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-300"
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 bg-gray-100 dark:bg-slate-700 rounded-full text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            Track New Task
-          </button>
-          <button
-            onClick={addTimer}
-            className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-300"
-          >
-            Set New Timer
+            {darkMode ? <FaSun className="w-5 h-5" /> : <FaMoon className="w-5 h-5" />}
           </button>
         </div>
-        <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Productivity Summary</h2>
-          <p className="text-gray-600 dark:text-gray-300">Total Productive Time: {formatTime(getTotalProductiveTime())}</p>
-          <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-800 dark:text-white">Completed Tasks:</h3>
-          <ul className="space-y-2">
-            {completedTasks.map((task, index) => (
-              <li key={index} className="text-gray-600 dark:text-gray-300">
-                {task.label} - {formatTime(task.duration)}
-              </li>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        {/* Action Buttons */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={addStopwatch}
+              className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-full hover:bg-gray-800 transition-colors duration-300 shadow-lg"
+            >
+              <FaPlus className="mr-2" /> Track New Task
+            </button>
+            <button
+              onClick={addTimer}
+              className="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors duration-300 shadow-lg"
+            >
+              <FaPlus className="mr-2" /> Set New Timer
+            </button>
+          </div>
+        </div>
+
+        {/* Content Container */}
+        <div className="max-w-4xl mx-auto">
+          {/* Timers Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {timers.map((timer) => (
+              <div key={timer.id} className="flex">
+                {timer.type === 'stopwatch' ? (
+                  <Stopwatch 
+                    onRemove={() => removeTimer(timer.id)} 
+                    darkMode={darkMode} 
+                    label={timer.label} 
+                    onUpdateLabel={(newLabel) => updateLabel(timer.id, newLabel)}
+                    onComplete={handleComplete}
+                  />
+                ) : (
+                  <Timer 
+                    onRemove={() => removeTimer(timer.id)} 
+                    darkMode={darkMode} 
+                    label={timer.label} 
+                    onUpdateLabel={(newLabel) => updateLabel(timer.id, newLabel)}
+                    onComplete={(label, duration) => handleComplete({
+                      label,
+                      duration,
+                      targetDuration: null,
+                      laps: [],
+                      completed: true,
+                      activityType: 'Timer'
+                    })}
+                  />
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
+
+          {/* Summary Section */}
+          {completedTasks.length > 0 && (
+            <section className="bg-gray-50/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col space-y-6">
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                    Productivity Summary
+                  </h2>
+                  <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+                    Total Productive Time: 
+                    <span className="ml-2 font-mono font-bold text-gray-800 dark:text-gray-200">
+                      {formatTime(getTotalProductiveTime())}
+                    </span>
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+                    Completed Tasks
+                  </h3>
+                  <div className="grid gap-4">
+                    {completedTasks.map((task, index) => (
+                      <div 
+                        key={index} 
+                        className="bg-white dark:bg-slate-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-600"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                          <div className="flex items-center">
+                            <span className="font-semibold text-gray-800 dark:text-gray-200">
+                              {task.label}
+                            </span>
+                          </div>
+                          <span className="font-mono text-gray-700 dark:text-gray-300">
+                            {formatTime(task.duration)}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400">
+                          <span className="inline-flex items-center bg-gray-100 dark:bg-slate-600 px-2 py-1 rounded-full">
+                            {task.activityType}
+                          </span>
+                          {task.targetDuration && (
+                            <span className="inline-flex items-center">
+                              Target: {formatTime(task.targetDuration)}
+                              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                                task.completed 
+                                  ? 'bg-green-50 text-green-800 dark:bg-green-900/50 dark:text-green-100' 
+                                  : 'bg-red-50 text-red-800 dark:bg-red-900/50 dark:text-red-100'
+                              }`}>
+                                {task.completed ? 'Completed' : 'Not Completed'}
+                              </span>
+                            </span>
+                          )}
+                          {task.laps.length > 0 && (
+                            <span className="inline-flex items-center bg-gray-100 dark:bg-slate-600 px-2 py-1 rounded-full">
+                              {task.laps.length} Laps
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

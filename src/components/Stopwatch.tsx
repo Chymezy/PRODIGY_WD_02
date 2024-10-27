@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import GuideModal from './GuideModal';
 import useSound from '../hooks/useSound';
+import { FaPlay, FaStop, FaFlag, FaUndo, FaClock, FaTimesCircle } from 'react-icons/fa';
 
 interface LapTime {
   id: number;
   time: string;
+  duration: number;
 }
 
 interface StopwatchProps {
@@ -12,14 +14,29 @@ interface StopwatchProps {
   darkMode: boolean;
   label: string;
   onUpdateLabel: (newLabel: string) => void;
-  onComplete: (label: string, duration: number, laps: LapTime[]) => void;
+  onComplete: (report: CompletedTaskReport) => void;
 }
+
+interface CompletedTaskReport {
+  label: string;
+  duration: number;
+  targetDuration: number | null;
+  laps: LapTime[];
+  completed: boolean;
+  activityType: string;
+}
+
+const activityTypes = [
+  'Work', 'Study', 'Exercise', 'Reading', 'Meditation', 'Hobby', 'Other'
+];
 
 const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpdateLabel, onComplete }) => {
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [laps, setLaps] = useState<LapTime[]>([]);
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
+  const [targetDuration, setTargetDuration] = useState<number | null>(null);
+  const [activityType, setActivityType] = useState<string>('Work');
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -52,7 +69,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpda
       playStart();
     } else {
       playStop();
-      onComplete(label, time, laps);
+      generateReport();
     }
   };
 
@@ -65,8 +82,8 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpda
   const handleLap = () => {
     if (isRunning) {
       setLaps((prevLaps) => [
-        { id: prevLaps.length + 1, time: formatTime(time) },
         ...prevLaps,
+        { id: prevLaps.length + 1, time: formatTime(time), duration: time },
       ]);
       playLap();
     }
@@ -79,6 +96,28 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpda
     }
   };
 
+  const handleTargetDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value ? parseInt(e.target.value, 10) * 60000 : null;
+    setTargetDuration(value);
+  };
+
+  const generateReport = () => {
+    const report: CompletedTaskReport = {
+      label,
+      duration: time,
+      targetDuration,
+      laps,
+      completed: targetDuration ? time >= targetDuration : true,
+      activityType,
+    };
+    onComplete(report);
+  };
+
+  const getProgressPercentage = () => {
+    if (!targetDuration) return 100;
+    return Math.min((time / targetDuration) * 100, 100);
+  };
+
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full`}>
       <div className="relative">
@@ -86,16 +125,43 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpda
           onClick={onRemove}
           className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          ✖️
+          <FaTimesCircle />
         </button>
         <h2 
-          className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 cursor-pointer hover:underline"
+          className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 cursor-pointer hover:underline flex items-center"
           onClick={handleLabelClick}
         >
-          {label}
+          <FaClock className="mr-2" /> {label}
         </h2>
       </div>
+      <div className="mb-4">
+        <select
+          value={activityType}
+          onChange={(e) => setActivityType(e.target.value)}
+          className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
+        >
+          {activityTypes.map((type) => (
+            <option key={type} value={type}>{type}</option>
+          ))}
+        </select>
+      </div>
+      <div className="mb-4">
+        <input
+          type="number"
+          placeholder="Target duration (minutes)"
+          onChange={handleTargetDurationChange}
+          className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
+        />
+      </div>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-center text-gray-800 dark:text-white font-mono">{formatTime(time)}</h1>
+      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div 
+          className={`h-2.5 rounded-full ${
+            getProgressPercentage() >= 100 ? 'bg-green-600' : 'bg-blue-600'
+          }`} 
+          style={{width: `${getProgressPercentage()}%`}}
+        ></div>
+      </div>
       <div className="flex justify-center space-x-2 sm:space-x-4 mb-6">
         <button
           className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-white font-semibold transition-colors duration-300 ${
@@ -103,20 +169,20 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRemove, darkMode, label, onUpda
           }`}
           onClick={handleStartStop}
         >
-          {isRunning ? 'Stop' : 'Start'}
+          {isRunning ? <FaStop /> : <FaPlay />}
         </button>
         <button
           className="px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-300"
           onClick={handleLap}
           disabled={!isRunning}
         >
-          Lap
+          <FaFlag />
         </button>
         <button
           className="px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-gray-500 hover:bg-gray-600 text-white font-semibold transition-colors duration-300"
           onClick={handleReset}
         >
-          Reset
+          <FaUndo />
         </button>
       </div>
       {laps.length > 0 && (
