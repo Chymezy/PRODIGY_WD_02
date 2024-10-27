@@ -17,6 +17,8 @@ This productivity timer application was developed as part of my internship proje
 - Apply TypeScript for type safety
 
 ## Features
+![Productivity Timer Screenshot](./public/productivity2.png)
+
 
 ### Core Functionality
 - **Multiple Timers**: Run multiple stopwatches and countdown timers simultaneously
