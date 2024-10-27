@@ -109,8 +109,8 @@ This project was developed during my internship at Prodigy InfoTech, where I:
 
 ## Contact
 
-- Your Name - [your.email@example.com](mailto:chymezy332@gmail.com)
-- LinkedIn - [Your LinkedIn Profile](https://linkedin.com/in/Chymezy)
+- Email - [contact me](mailto:chymezy332@gmail.com)
+- LinkedIn - [view profile](https://linkedin.com/in/Chymezy)
 - Project Link: [https://github.com/Chymezy/PRODIGY_WD_02.git](https://github.com/Chymezy/PRODIGY_WD_02.git)
 
 ## Acknowledgments
